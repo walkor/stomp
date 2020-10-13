@@ -1,5 +1,5 @@
 # MQTT
-Asynchronous STOMP client for PHP based on workerman.
+Asynchronous STOMP client for PHP based on [workerman](https://github.com/walkor/workerman).
 
 # Installation
 composer require workerman/stomp
