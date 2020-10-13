@@ -1,0 +1,13 @@
+{
+    "name"  : "workerman/stomp",
+    "type"  : "library",
+    "homepage": "http://www.workerman.net",
+    "license" : "MIT",
+    "require": {
+        "php": ">=5.4",
+        "workerman/workerman" : ">=3.3.0"
+    },
+    "autoload": {
+        "psr-4": {"Workerman\\Stomp\\": "./src"}
+    }
+}
