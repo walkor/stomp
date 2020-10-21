@@ -652,7 +652,9 @@ class Client
         if ($this->checkDisconnecting()) {
             return;
         }
-        $this->echoDebug($package, 'send');
+        if ($this->_options['debug']) {
+            $this->echoDebug($package, 'send');
+        }
         $this->_connection->send($package);
     }
 
