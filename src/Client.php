@@ -422,7 +422,7 @@ class Client
                 $callback = $this->_subscriptions[$subscription]['callback'];
 
                 $resolver = new AckResolver($this, $subscription, $message_id);
-                if ('auto' !== $this->_subscriptions[$subscription]['ack']) {
+                if ('auto' == $this->_subscriptions[$subscription]['ack']) {
                     $resolver->done();
                 }
                 call_user_func($callback, $this, $data, $resolver);
