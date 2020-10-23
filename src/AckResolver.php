@@ -38,7 +38,7 @@ class AckResolver
             return;
         }
         $this->_client->ack($this->_subscription, $this->_messageId, $headers);
-        $this->_done = 1;
+        $this->_done = true;
         $this->_client = null;
     }
 
@@ -50,6 +50,11 @@ class AckResolver
         $this->_client->nack($this->_subscription, $this->_messageId, $headers);
         $this->_done = 1;
         $this->_client = null;
+    }
+
+    public function done()
+    {
+        $this->_done = true;
     }
 
 }

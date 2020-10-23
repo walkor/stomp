@@ -421,12 +421,11 @@ class Client
 
                 $callback = $this->_subscriptions[$subscription]['callback'];
 
+                $resolver = new AckResolver($this, $subscription, $message_id);
                 if ('auto' !== $this->_subscriptions[$subscription]['ack']) {
-                    $resolver = new AckResolver($this, $subscription, $message_id);
-                    call_user_func($callback, $this, $data, $resolver);
-                } else {
-                    call_user_func($callback, $this, $data);
+                    $resolver->done();
                 }
+                call_user_func($callback, $this, $data, $resolver);
 
                 return;
             case 'ERROR':
