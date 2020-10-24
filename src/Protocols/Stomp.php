@@ -41,11 +41,15 @@ class Stomp
         unset($header_data[0]);
         foreach ($header_data as $line) {
             list($key, $value) = explode(':', $line, 2);
-            if ($key === 'content-length') {
+            if (strtolower($key) === 'content-length') {
                 return $value + $pos + 3;
             }
         }
-        return false;
+        $end_pos = strpos($buffer, "\x00");
+        if (!$end_pos) {
+            return 0;
+        }
+        return $end_pos + 1;
     }
 
     /**
