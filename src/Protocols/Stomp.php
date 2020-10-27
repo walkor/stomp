@@ -28,6 +28,9 @@ class Stomp
      */
     public static function input($buffer)
     {
+        if ($buffer[0] == "\n") {
+            return 1;
+        }
         $pos = strpos($buffer, "\n\n");
         if (false === $pos) {
             return 0;
@@ -60,6 +63,7 @@ class Stomp
      */
     public static function encode(array $data)
     {
+        if ($data['cmd'] === 'HEARTBEAT') return "\n";
         $headers = '';
         if (isset($data['headers'])) {
             foreach ($data['headers'] as $key => $value) {
@@ -78,6 +82,9 @@ class Stomp
      */
     public static function decode($buffer)
     {
+        if ($buffer[0] == "\n") {
+            return ['cmd' => 'HEARTBEAT', 'headers' => [], 'body' => ''];
+        }
         list($head, $body) = explode("\n\n", $buffer, 2);
         $header_data = explode("\n", trim($head, "\n"));
         $command = $header_data[0];

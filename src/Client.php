@@ -130,6 +130,7 @@ class Client
         'connect_timeout'  => 30,
         'reconnect_period' => 2,
         'debug'            => false,
+        'heart_beat'       => [0, 0],
     ];
 
     /**
@@ -175,19 +176,24 @@ class Client
         if ($this->_options['debug']) {
             echo "-> Try to connect to {$this->_remoteAddress}", PHP_EOL;
         }
+        if ($this->_options['heart_beat'][0]) {
+            $this->setPingTimer($this->_options['heart_beat'][0]/1000);
+        }
     }
 
     /**
      * subscribe
      *
-     * @param $topic
-     * @param array $options
+     * @param $destination
      * @param callable $callback
+     * @param array $headers
+     *
+     * @return string
      */
     public function subscribe($destination, $callback, array $headers = [])
     {
         if ($this->checkDisconnecting()) {
-            return;
+            return false;
         }
         $raw_headers            = $headers;
         $headers['id']          = isset($headers['id']) ? $headers['id'] : $this->createClientId();
@@ -211,6 +217,13 @@ class Client
         return $subscription;
     }
 
+    /**
+     * @param $destination
+     * @param $callback
+     * @param array $headers
+     *
+     * @return string
+     */
     public function subscribeWithAck($destination, $callback, array $headers = [])
     {
         if (!isset($headers['ack']) || $headers['ack'] === 'auto') {
@@ -279,7 +292,6 @@ class Client
      */
     public function send($destination, $body, array $headers = [])
     {
-
         $headers['destination']    = $destination;
         $headers['content-length'] = strlen($body);
         if (!isset($headers['content-type'])) {
@@ -361,6 +373,9 @@ class Client
         if ($this->_options['login'] !== null && $this->_options['passcode'] !== null) {
             $headers['login']    = $this->_options['login'];
             $headers['passcode'] = $this->_options['passcode'];
+            if ($this->_options['heart_beat']) {
+                $headers['heart-beat'] = implode(',', $this->_options['heart_beat']);
+            }
         }
         $this->sendPackage([
             'cmd'     => 'CONNECT',
@@ -437,6 +452,8 @@ class Client
                 if ($this->_state === static::STATE_DISCONNECTING) {
                     $this->close();
                 }
+                return;
+            case 'HEARTBEAT':
                 return;
             default :
                 echo "unknown cmd $cmd\n";
@@ -582,20 +599,8 @@ class Client
         $this->cancelPingTimer();
         $connection = $this->_connection;
         $this->_pingTimer = Timer::add($ping_interval, function() use ($connection) {
-            if (!$this->_recvPingResponse) {
-                if ($this->_options['debug']) {
-                    echo "<- Recv PINGRESP timeout", PHP_EOL;
-                    echo "-> Close connection", PHP_EOL;
-                }
-                $this->_connection->destroy();
-                return;
-            }
-            if ($this->_options['debug']) {
-                echo "-> Send PINGREQ package", PHP_EOL;
-            }
-            $this->_recvPingResponse = false;
             if ($this->_state === static::STATE_ESTABLISHED) {
-                //$connection->send(['cmd' => 'PING']);
+                $this->sendPackage(['cmd' => 'HEARTBEAT']);
             }
         });
     }
@@ -665,6 +670,10 @@ class Client
      */
     protected function setOptions($options)
     {
+        if (isset($options['heart_beat']) && !is_array($options['heart_beat']))
+        {
+            $options['heart_beat'] = [$options['heart_beat'], 0];
+        }
         $this->_options = array_merge($this->_options, $options);
     }
 }
