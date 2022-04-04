@@ -12,7 +12,7 @@ composer require workerman/stomp
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 use Workerman\Worker;
-use Workerman\Lib\Timer;
+use Workerman\Timer;
 use Workerman\Stomp\Client;
 
 $worker = new Worker();
