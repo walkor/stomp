@@ -28,7 +28,7 @@ class Stomp
      */
     public static function input($buffer)
     {
-        if ($buffer[0] == "\n") {
+        if ($buffer[0] == "\n" || $buffer[0] == "\x00") {
             return 1;
         }
         $pos = strpos($buffer, "\n\n");
@@ -82,7 +82,7 @@ class Stomp
      */
     public static function decode($buffer)
     {
-        if ($buffer[0] == "\n") {
+        if ($buffer[0] == "\n" || $buffer[0] == "\x00") {
             return ['cmd' => 'HEARTBEAT', 'headers' => [], 'body' => ''];
         }
         list($head, $body) = explode("\n\n", $buffer, 2);
