@@ -396,6 +396,9 @@ class Client
             $headers['ack'] = $item['ack'];
             $this->subscribe($destination, $callback, $headers);
         }
+        if ($this->_options['heart_beat'][0]) {
+            $this->setPingTimer($this->_options['heart_beat'][0]/1000);
+        }
     }
 
     /**
