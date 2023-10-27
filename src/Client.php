@@ -20,6 +20,7 @@ use \Workerman\Timer;
  * Class Client
  * @package Workerman\Stomp
  */
+#[\AllowDynamicProperties]
 class Client
 {
     /**
