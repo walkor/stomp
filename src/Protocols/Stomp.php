@@ -18,6 +18,7 @@ namespace Workerman\Stomp\Protocols;
  * 
  * @author    walkor<walkor@workerman.net>
  */
+#[\AllowDynamicProperties]
 class Stomp
 {
     /**
