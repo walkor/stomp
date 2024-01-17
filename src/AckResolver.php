@@ -15,6 +15,7 @@ namespace Workerman\Stomp;
 
 use Workerman\Stomp\Client;
 
+#[\AllowDynamicProperties]
 class AckResolver
 {
     /**
